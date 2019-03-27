@@ -1,29 +1,36 @@
-import os
+import argparse
+import time
+
 import cv2
 import numpy as np
-import time
-from torch.multiprocessing import Pool
-from utils.nms_wrapper import nms
-from utils.timer import Timer
+import os
+import torch
+import torch.backends.cudnn as cudnn
+
 from configs.CC import Config
-import argparse
+from data import BaseTransform
 from layers.functions import Detect, PriorBox
 from m2det import build_net
-from data import BaseTransform
-from utils.core import *
-from utils.pycocotools.coco import COCO
-
-parser = argparse.ArgumentParser(description='M2Det Testing')
-parser.add_argument('-c', '--config', default='configs/m2det320_vgg.py', type=str)
-parser.add_argument('-f', '--directory', default='imgs/', help='the path to demo images')
-parser.add_argument('-m', '--trained_model', default=None, type=str, help='Trained state_dict file path to open')
-parser.add_argument('--cam', default=-1, type=int, help='camera device id')
-parser.add_argument('--show', action='store_true', help='Whether to display the images')
-args = parser.parse_args()
+from utils.core import print_info, anchors, init_net
+from utils.nms_wrapper import nms
 
 print_info(' ----------------------------------------------------------------------\n'
            '|                       M2Det Demo Program                             |\n'
-           ' ----------------------------------------------------------------------', ['yellow','bold'])
+           ' ----------------------------------------------------------------------', ['yellow', 'bold'])
+
+
+def get_args():
+    parser = argparse.ArgumentParser(description='M2Det Testing')
+    parser.add_argument('-c', '--config', default='configs/m2det320_vgg.py', type=str)
+    parser.add_argument('-f', '--directory', default='imgs/', help='the path to demo images')
+    parser.add_argument('-m', '--trained_model', default=None, type=str, help='Trained state_dict file path to open')
+    parser.add_argument('--cam', default=-1, type=int, help='camera device id')
+    parser.add_argument('--show', action='store_true', help='Whether to display the images')
+    args = parser.parse_args()
+    return args
+
+
+args = get_args()
 
 global cfg
 cfg = Config.fromfile(args.config)
