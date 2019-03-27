@@ -11,6 +11,10 @@ torchvision = "*"
 opencv-python = "*"
 tqdm = "*"
 numpy = "*"
+tensorflow = "*"
+cython = "*"
+addict = "*"
+matplotlib = "*"
 
 [requires]
 python_version = "3.7"
