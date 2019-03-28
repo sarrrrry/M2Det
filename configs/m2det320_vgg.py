@@ -21,7 +21,8 @@ model = dict(
         size_pattern = [0.08, 0.15, 0.33, 0.51, 0.69, 0.87, 1.05],
         ),
     save_eposhs = 10,
-    weights_save = 'weights/'
+    # weights_save = 'weights/'
+    weights_save = '/raid/projects/logo_detection/M2Det/weights/'
     )
 
 train_cfg = dict(
@@ -64,14 +65,20 @@ dataset = dict(
         train_sets = [('2007', 'trainval'), ('2012', 'trainval')],
         eval_sets = [('2007', 'test')],
         ),
+    # COCO = dict(
+    #     train_sets = [('2014', 'train'), ('2014', 'valminusminival')],
+    #     eval_sets = [('2014', 'minival')],
+    #     test_sets = [('2015', 'test-dev')],
+    #     )
+    # )
     COCO = dict(
-        train_sets = [('2014', 'train'), ('2014', 'valminusminival')],
-        eval_sets = [('2014', 'minival')],
-        test_sets = [('2015', 'test-dev')],
-        )
+        train_sets = [('2014', 'train')],
+        eval_sets = [('2014', 'val')],
+        test_sets = [('2014', 'test')],
     )
+)
 
 import os
 home = os.path.expanduser("~")
 VOCroot = os.path.join(home,"data/VOCdevkit/")
-COCOroot = os.path.join(home,"data/coco/")
+COCOroot = "/raid/datasets/mscoco"
