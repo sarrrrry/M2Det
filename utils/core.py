@@ -1,4 +1,6 @@
 import time,os
+from pathlib import PosixPath, Path
+
 import torch
 import shutil
 import argparse
@@ -15,11 +17,14 @@ from termcolor import cprint
 from utils.nms_wrapper import nms
 import numpy as np
 
-def set_logger(status):
+def set_logger(status, log_dir: PosixPath=None):
     if status:
         from logger import Logger
         date = time.strftime("%m_%d_%H_%M") + '_log'
-        log_path = './logs/'+ date
+        if log_dir:
+            log_path = str(Path(log_dir)/date)
+        else:
+            log_path = './logs/'+ date
         if os.path.exists(log_path):
             shutil.rmtree(log_path)
         os.makedirs(log_path)
@@ -88,12 +93,18 @@ def get_dataloader(cfg, dataset, setname='train_sets'):
     _preproc = preproc(cfg.model.input_size, cfg.model.rgb_means, cfg.model.p)
     Dataloader_function = {'VOC': VOCDetection, 'COCO':COCODetection}
     _Dataloader_function = Dataloader_function[dataset]
-    if setname == 'train_sets':
-        dataset = _Dataloader_function(cfg.COCOroot if dataset == 'COCO' else cfg.VOCroot,
-                                   getattr(cfg.dataset, dataset)[setname], _preproc)
-    else:
-        dataset = _Dataloader_function(cfg.COCOroot if dataset == 'COCO' else cfg.VOCroot,
-                                   getattr(cfg.dataset, dataset)[setname], None)
+    try:
+        if setname == 'train_sets':
+            dataset = _Dataloader_function(
+                root=(cfg.COCOroot if dataset == 'COCO' else cfg.VOCroot),
+                image_sets=getattr(cfg.dataset, dataset)[setname],
+                preproc=_preproc
+            )
+        else:
+            dataset = _Dataloader_function(cfg.COCOroot if dataset == 'COCO' else cfg.VOCroot,
+                                       getattr(cfg.dataset, dataset)[setname], None)
+    except:
+        print("for debugging")
     return dataset
     
 def print_train_log(iteration, print_epochs, info_list):
