@@ -9,16 +9,12 @@ Author:  Qijie Zhao (zhaoqijie@pku.edu.cn)
 Finished Date:  01/17/2019
 
 '''
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.autograd import Variable
+from pathlib import Path
+
 import warnings
+
 warnings.filterwarnings('ignore')
-import torchvision.transforms as transforms
-import torchvision.models as models
-import torch.backends.cudnn as cudnn
-import os,sys,time
+import os
 from layers.nn_utils import *
 from torch.nn import init as init
 from utils.core import print_info
@@ -148,10 +144,11 @@ class M2Det(nn.Module):
         return output
 
     def init_model(self, base_model_path):
+        base_model_path = Path(base_model_path)
         if self.backbone == 'vgg16':
-            if isinstance(base_model_path, str):
-                base_weights = torch.load(base_model_path)
-                print_info('Loading base network...')
+            if base_model_path.exists():
+                base_weights = torch.load(str(base_model_path))
+                print_info('Loading base network...\n')
                 self.base.load_state_dict(base_weights)
         elif 'res' in self.backbone:
             pass # pretrained seresnet models are initially loaded when defining them.

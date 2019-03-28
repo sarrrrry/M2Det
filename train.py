@@ -1,11 +1,14 @@
 from __future__ import print_function
-import os
+
 import warnings
+
+from utils.core import print_info, set_logger, init_net, set_optimizer, set_criterion, anchors, get_dataloader, \
+    save_checkpoint, adjust_learning_rate, write_logger, print_train_log
+
 warnings.filterwarnings('ignore')
 
 import time
 import torch
-import shutil
 import argparse
 from m2det import build_net
 import torch.utils.data as data
@@ -13,10 +16,11 @@ import torch.backends.cudnn as cudnn
 from layers.functions import PriorBox
 from data import detection_collate
 from configs.CC import Config
-from utils.core import *
+
+# from utils.core import *
 
 parser = argparse.ArgumentParser(description='M2Det Training')
-parser.add_argument('-c', '--config', default='configs/m2det320_vgg16.py')
+parser.add_argument('-c', '--config', default='configs/m2det320_vgg.py')
 parser.add_argument('-d', '--dataset', default='COCO', help='VOC or COCO dataset')
 parser.add_argument('--ngpu', default=1, type=int, help='gpus')
 parser.add_argument('--resume_net', default=None, help='resume net for retraining')
@@ -95,4 +99,5 @@ if __name__ == '__main__':
         load_t1 = time.time()
         print_train_log(iteration, cfg.train_cfg.print_epochs,
                             [time.ctime(),epoch,iteration%epoch_size,epoch_size,iteration,loss_l.item(),loss_c.item(),load_t1-load_t0,lr])
+        break
     save_checkpoint(net, cfg, final=True, datasetname=args.dataset,epoch=-1)

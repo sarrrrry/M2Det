@@ -6,20 +6,19 @@ https://github.com/fmassa/vision/blob/voc_dataset/torchvision/datasets/voc.py
 Updated by: Ellis Brown, Max deGroot
 """
 
-import os
+import json
 import pickle
+
+import cv2
+import numpy as np
+import os
 import os.path
-import sys
 import torch
 import torch.utils.data as data
 import torchvision.transforms as transforms
-import cv2
-import numpy as np
-import json
-import uuid
+
 from utils.pycocotools.coco import COCO
 from utils.pycocotools.cocoeval import COCOeval
-from utils.pycocotools import mask as COCOmask
 
 
 class COCODetection(data.Dataset):
@@ -34,7 +33,7 @@ class COCODetection(data.Dataset):
         self.preproc = preproc
         self.target_transform = target_transform
         self.name = dataset_name
-        self.ids = list()
+        self.img_paths = list()
         self.annotations = list()
         self._view_map = {
             'minival2014' : 'val2014',          # 5k val2014 subset
@@ -59,11 +58,40 @@ class COCODetection(data.Dataset):
                                                   _COCO.getCatIds()))
             indexes = _COCO.getImgIds()
             self.image_indexes = indexes
-            self.ids.extend([self.image_path_from_index(data_name, index) for index in indexes ])
+            self.img_paths.extend([self.image_path_from_index(data_name, index) for index in indexes])
             if image_set.find('test') != -1:
                 print('test set will not load annotations!')
             else:
                 self.annotations.extend(self._load_coco_annotations(coco_name, indexes,_COCO))
+
+    def __len__(self):
+        return len(self.img_paths)
+
+    def __getitem__(self, index: int):
+        """
+
+        :param index:
+        :return:
+            img: (Tensor)
+                shape -> (channel, height, width)
+                It is the image transferred tensor
+            target: (np.ndarray)
+                shape -> (num_of_objects, 5)
+                5 -> (???, ???, ???, ???, label)
+                maybe, ??? are coordinates
+        """
+        img_path = self.img_paths[index]
+        target = self.annotations[index]
+        img = cv2.imread(str(img_path), cv2.IMREAD_COLOR)
+        height, width, _ = img.shape
+
+        if self.target_transform is not None:
+            target = self.target_transform(target)
+
+        if self.preproc is not None:
+            img, target = self.preproc(img, target)
+
+        return img, target
 
 
 
@@ -147,27 +175,6 @@ class COCODetection(data.Dataset):
 
 
 
-    def __getitem__(self, index):
-        img_id = self.ids[index]
-        target = self.annotations[index]
-        img = cv2.imread(img_id, cv2.IMREAD_COLOR)
-        height, width, _ = img.shape
-
-        if self.target_transform is not None:
-            target = self.target_transform(target)
-
-
-        if self.preproc is not None:
-            img, target = self.preproc(img, target)
-
-                    # target = self.target_transform(target, width, height)
-        #print(target.shape)
-
-        return img, target
-
-    def __len__(self):
-        return len(self.ids)
-
     def pull_image(self, index):
         '''Returns the original image object at index in PIL form
 
@@ -179,7 +186,7 @@ class COCODetection(data.Dataset):
         Return:
             PIL img
         '''
-        img_id = self.ids[index]
+        img_id = self.img_paths[index]
         return cv2.imread(img_id, cv2.IMREAD_COLOR)
 
 

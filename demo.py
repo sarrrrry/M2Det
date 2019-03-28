@@ -27,6 +27,7 @@ def get_args():
     parser.add_argument('--cam', default=-1, type=int, help='camera device id')
     parser.add_argument('--show', action='store_true', help='Whether to display the images')
     args = parser.parse_args()
+    args.trained_model = "/raid/projects/logo_detection/M2Det/weights/m2det512_vgg.pth"
     return args
 
 
