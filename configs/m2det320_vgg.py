@@ -12,7 +12,8 @@ model = dict(
         num_scales = 6,
         sfam = False,
         smooth = True,
-        num_classes = 81,
+        # num_classes = 81,
+        num_classes = 10,
         ),
     rgb_means = (104, 117, 123),
     p = 0.6,
@@ -80,5 +81,5 @@ dataset = dict(
 
 import os
 home = os.path.expanduser("~")
-VOCroot = os.path.join(home,"data/VOCdevkit/")
+VOCroot = os.path.join(home,"datasets/VOCdevkit/")
 COCOroot = "/raid/datasets/mscoco"

@@ -1,5 +1,5 @@
 # Only m2det_configs are supported
-# For debug when configuring m2det.py file
+# For debug when configuring net.py file
 # you can modify them in m2det_config in ./configs/m2detxxx.py
 
 m2det_configs = dict(

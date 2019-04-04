@@ -1,7 +1,7 @@
 """Data augmentation functionality. Passed as callable transformations to
 Dataset classes.
 
-The data augmentation procedures were interpreted from @weiliu89's SSD paper
+The datasets augmentation procedures were interpreted from @weiliu89's SSD paper
 http://arxiv.org/abs/1512.02325
 """
 
@@ -227,7 +227,7 @@ class BaseTransform(object):
         swap ((int,int,int)): final order of channels
     Returns:
         transform (transform) : callable transform to be applied to test/val
-        data
+        datasets
     """
     def __init__(self, resize, rgb_means, swap=(2, 0, 1)):
         self.means = rgb_means
