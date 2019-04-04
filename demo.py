@@ -8,7 +8,7 @@ import torch
 import torch.backends.cudnn as cudnn
 
 from configs.CC import Config
-from data import BaseTransform
+from m2det.datasets import BaseTransform
 from layers.functions import Detect, PriorBox
 from m2det import build_net
 from utils.core import print_info, anchors, init_net
@@ -64,7 +64,7 @@ def _to_color(indx, base):
     return b * 127, r * 127, g * 127
 base = int(np.ceil(pow(cfg.model.m2det_config.num_classes, 1. / 3)))
 colors = [_to_color(x, base) for x in range(cfg.model.m2det_config.num_classes)]
-cats = [_.strip().split(',')[-1] for _ in open('data/coco_labels.txt','r').readlines()]
+cats = [_.strip().split(',')[-1] for _ in open('datasets/coco_labels.txt','r').readlines()]
 labels = tuple(['__background__'] + cats)
 
 def draw_detection(im, bboxes, scores, cls_inds, fps, thr=0.2):
